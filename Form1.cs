@@ -16,7 +16,7 @@ namespace Lab6
         MyStorage storage; // хранилище
         DrawFigures G; // рисовальщик
 
-        bool ctrlPressed = false;
+        bool ctrlPressed;
 
         public Form1()
         {
@@ -91,11 +91,19 @@ namespace Lab6
 
             //====================
 
-            CCircle obj = new CCircle(x, y, G);
+            CShape obj = null;
+
+            if (btnCircle.Enabled == false)
+                obj = new CCircle(x, y, G);
+            else if (btnTriangle.Enabled == false)
+                obj = new CTriangle(x, y, G);
+            else if (btnSquare.Enabled == false)
+                obj = new CSquare(x, y, G);
 
             //====================
 
-            obj.DrawCircle();
+            if (obj != null)
+                obj.Draw();
             sheet.Image = G.GetBitmap();
 
             //====================
@@ -105,10 +113,35 @@ namespace Lab6
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
         {
-            sheet.Width = this.Size.Width - 166;
+            sheet.Width = this.Size.Width - panel.Width - 16;
             sheet.Height = this.Size.Height - 39;
             panel.Height = this.Size.Height - 39;
         }
+
+        //=====================
+        // СДЕЛАТЬ MVC
+        private void btnCircle_Click(object sender, EventArgs e)
+        {
+            btnCircle.Enabled = false;
+            btnTriangle.Enabled = true;
+            btnSquare.Enabled = true;
+        }
+
+        private void btnTriangle_Click(object sender, EventArgs e)
+        {
+            btnCircle.Enabled = true;
+            btnTriangle.Enabled = false;
+            btnSquare.Enabled = true;
+        }
+
+        private void btnSquare_Click(object sender, EventArgs e)
+        {
+            btnCircle.Enabled = true;
+            btnTriangle.Enabled = true;
+            btnSquare.Enabled = false;
+        }
+
+        //=====================
     }
 }
 
