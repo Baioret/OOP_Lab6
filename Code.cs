@@ -49,23 +49,20 @@ namespace Lab6
                 g.DrawEllipse(blackPen, (x - R), (y - R), 2 * R, 2 * R);
         }
 
-        public void DrawTriangle(int x, int y, bool selected)
+        public void DrawTriangle(Point[] points, bool selected)
         {
-            Point[] points = new Point[3];
-
-            points[0].X = x; points[0].Y = y - 15;
-            points[1].X = x - 35; points[1].Y = y + 45;
-            points[2].X = x + 35; points[2].Y = y + 45;
-
             if (selected)
                 g.DrawPolygon(greenPen, points);
             else
                 g.DrawPolygon(blackPen, points);
         }
 
-        public void DrawSquare()
+        public void DrawSquare(int x, int y, int a, bool selected)
         {
-
+            if (selected)
+                g.DrawRectangle(greenPen, x, y, a, a);
+            else
+                g.DrawRectangle(blackPen, x, y, a, a);
         }
 
         public void DrawStorage(MyStorage storage)
@@ -110,42 +107,49 @@ namespace Lab6
             draw.DrawCircle(x, y, R, selected);
         }
 
-        override public bool WasClicked(int coordX, int coordY)
+        override public bool WasClicked(int x0, int y0)
         {
-            if (Math.Pow(x - coordX, 2) + Math.Pow(y - coordY, 2) <= R * R)
-                return true;
-            else
-                return false;
+            return (Math.Pow(x - x0, 2) + Math.Pow(y - y0, 2) <= R * R);
         }
     }
 
     public class CTriangle : CShape
     {
-        DrawFigures draw;
+        private DrawFigures draw;
+
+        private Point[] points = new Point[3];
 
         public CTriangle(int x, int y, DrawFigures G)
         {
             this.x = x;
             this.y = y;
             draw = G;
+
+            points[0].X = x; points[0].Y = y - 35;
+            points[1].X = x - 35; points[1].Y = y + 25;
+            points[2].X = x + 35; points[2].Y = y + 25;
         }
 
         public override void Draw()
         {
-            draw.DrawTriangle(x, y, selected);
+            draw.DrawTriangle(points, selected);
         }
 
-        override public bool WasClicked(int coordX, int coordY)
+        override public bool WasClicked(int x0, int y0)
         {
-            return true;
+            int a = (points[0].X - x0) * (points[1].Y - points[0].Y) - (points[1].X - points[0].X) * (points[0].Y - y0);
+            int b = (points[1].X - x0) * (points[2].Y - points[1].Y) - (points[2].X - points[1].X) * (points[1].Y - y0);
+            int c = (points[2].X - x0) * (points[0].Y - points[2].Y) - (points[0].X - points[2].X) * (points[2].Y - y0);
+
+            return (a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0);
         }
     }
 
     public class CSquare : CShape
     {
-        DrawFigures draw;
+        private DrawFigures draw;
 
-        private int a;
+        private int a = 60; // сторона квадрата
 
         public CSquare(int x, int y, DrawFigures G)
         {
@@ -156,12 +160,12 @@ namespace Lab6
 
         public override void Draw()
         {
-            draw.DrawSquare();
+            draw.DrawSquare(x - a / 2, y - a / 2, a, selected);
         }
 
-        public override bool WasClicked(int coordX, int coordY)
+        public override bool WasClicked(int x0, int y0)
         {
-            return true;
+            return x0 >= x - a / 2 && y0 >= y - a / 2 && x0 <= x + a && y0 <= y + a;
         }
     }
 }

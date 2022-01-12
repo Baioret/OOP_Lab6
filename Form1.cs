@@ -32,7 +32,7 @@ namespace Lab6
             bool wasClicked = false;
 
             for (storage.first(); !storage.isEOL(); storage.next())
-                if (storage.getObject() is CCircle c)
+                if (storage.getObject() is CShape c)
                     if (c.WasClicked(e.X, e.Y) == true)
                     {
                         if (ctrlPressed == false)
@@ -68,7 +68,7 @@ namespace Lab6
             if (e.KeyCode == Keys.Delete)
             {
                 for (storage.first(); !storage.isEOL(); storage.next())
-                    if (storage.getObject() is CCircle c)
+                    if (storage.getObject() is CShape c)
                         if (c.Selected())
                             storage.del(c);
 
