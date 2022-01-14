@@ -23,6 +23,14 @@ namespace Lab6
             InitializeComponent();
             storage = new MyStorage();
             G = new DrawFigures(sheet.Width, sheet.Height);
+
+            foreach (var color in Enum.GetNames(typeof(KnownColor)))
+                colorList.Items.Add(color.ToString());
+        }
+
+        public PictureBox GetSheet()
+        {
+            return sheet;
         }
 
         private void sheet_MouseUp(object sender, MouseEventArgs e)
@@ -31,27 +39,26 @@ namespace Lab6
 
             bool wasClicked = false;
 
+            CShape curr = null;
+
             for (storage.first(); !storage.isEOL(); storage.next())
                 if (storage.getObject() is CShape c)
                     if (c.WasClicked(e.X, e.Y) == true)
-                    {
-                        if (ctrlPressed == false)
-                            G.UnselectAll(storage);
+                        curr = c;
 
-                        wasClicked = true;
-                        c.Select();
+            if (curr != null)
+            {
+                if (ctrlPressed == false)
+                    G.UnselectAll(storage);
 
-                        break;
-                    }
-
+                wasClicked = true;
+                curr.Select();
+            }
 
             if (wasClicked == false)
                 NewObject(e.X, e.Y);
             else
-            {
-                G.DrawStorage(storage);
-                sheet.Image = G.GetBitmap();
-            }
+                UpdateSheet();
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -64,6 +71,40 @@ namespace Lab6
             if (e.KeyCode == Keys.ControlKey)
                 ctrlPressed = true;
 
+            if (e.KeyCode == Keys.Up || e.KeyCode == Keys.Down || e.KeyCode == Keys.Right || e.KeyCode == Keys.Left)
+            {
+                for (storage.first(); !storage.isEOL(); storage.next())
+                    if (storage.getObject() is CShape c)
+                        if (c.Selected())
+                        {
+                            if (e.KeyCode == Keys.Up)
+                                c.Move("up");
+                            if (e.KeyCode == Keys.Down)
+                                c.Move("down");
+                            if (e.KeyCode == Keys.Right)
+                                c.Move("right");
+                            if (e.KeyCode == Keys.Left)
+                                c.Move("left");
+                        }
+
+
+                UpdateSheet();
+            }
+
+            if (ctrlPressed == true && (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.OemMinus))
+            {
+                for (storage.first(); !storage.isEOL(); storage.next())
+                    if (storage.getObject() is CShape c)
+                        if (c.Selected())
+                        {
+                            if (e.KeyCode == Keys.Oemplus)
+                                c.ChangeSize("+");
+                            else if (e.KeyCode == Keys.OemMinus)
+                                c.ChangeSize("-");
+                        }
+
+                UpdateSheet();
+            }
 
             if (e.KeyCode == Keys.Delete)
             {
@@ -72,10 +113,16 @@ namespace Lab6
                         if (c.Selected())
                             storage.del(c);
 
-                G.ClearSheet();
-                G.DrawStorage(storage);
-                sheet.Image = G.GetBitmap();
+
+                UpdateSheet();
             }
+        }
+
+        private void UpdateSheet()
+        {
+            G.ClearSheet();
+            G.DrawStorage(storage);
+            sheet.Image = G.GetBitmap();
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -86,6 +133,7 @@ namespace Lab6
 
         private void NewObject(int x, int y)
         {
+
             G.UnselectAll(storage);
             G.DrawStorage(storage);
 
@@ -118,13 +166,14 @@ namespace Lab6
             panel.Height = this.Size.Height - 39;
         }
 
-        //=====================
         // СДЕЛАТЬ MVC
         private void btnCircle_Click(object sender, EventArgs e)
         {
             btnCircle.Enabled = false;
             btnTriangle.Enabled = true;
             btnSquare.Enabled = true;
+
+            ActiveControl = sheet;
         }
 
         private void btnTriangle_Click(object sender, EventArgs e)
@@ -132,6 +181,8 @@ namespace Lab6
             btnCircle.Enabled = true;
             btnTriangle.Enabled = false;
             btnSquare.Enabled = true;
+
+            ActiveControl = sheet;
         }
 
         private void btnSquare_Click(object sender, EventArgs e)
@@ -139,9 +190,34 @@ namespace Lab6
             btnCircle.Enabled = true;
             btnTriangle.Enabled = true;
             btnSquare.Enabled = false;
+
+           ActiveControl = sheet;
         }
 
-        //=====================
+        private void colorList_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            colorPreview.BackColor = Color.FromName(colorList.SelectedItem.ToString());
+        }
+
+        private void btnChangeColor_Click(object sender, EventArgs e)
+        {
+            if (colorList.SelectedItem != null)
+            {
+                for (storage.first(); !storage.isEOL(); storage.next())
+                    if (storage.getObject() is CShape c)
+                        if (c.Selected())
+                            c.ChangeColor(colorList.SelectedItem.ToString());
+
+                UpdateSheet();
+
+                ActiveControl = sheet;
+            }
+        }
+
+        private void colorList_DropDownClosed(object sender, EventArgs e)
+        {
+            ActiveControl = sheet;
+        }
     }
 }
 
