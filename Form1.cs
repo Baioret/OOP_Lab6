@@ -268,23 +268,33 @@ namespace Lab6
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            StreamWriter stream = new StreamWriter("D://CPP/OOP/Lab6/Shapes.txt", false);
+            OpenFileDialog file = new OpenFileDialog();
 
-            for (storage.first(); !storage.isEOL(); storage.next())
-                if (storage.getObject() is CShape c)
-                    c.Save(stream);
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                StreamWriter stream = new StreamWriter(file.FileName, false);
 
-            stream.Close();
+                for (storage.first(); !storage.isEOL(); storage.next())
+                    if (storage.getObject() is CShapeSaveLoad c)
+                        c.Save(stream);
+
+                stream.Close();
+            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            StreamReader stream = new StreamReader("D://CPP/OOP/Lab6/Shapes.txt", false);
+            OpenFileDialog file = new OpenFileDialog();
 
-            storage.loadShapes(stream, factory, G);
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                StreamReader stream = new StreamReader(file.FileName, false);
 
-            stream.Close();
+                storage.LoadShapes(stream, factory, G);
+
+                stream.Close();
+            }
+
         }
     }
 }
-

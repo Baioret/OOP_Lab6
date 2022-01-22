@@ -8,10 +8,19 @@ using ClassLibraryStorage;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
+using System.IO;
 
 
 namespace Lab6
 {
+
+    public abstract class CShapeSaveLoad : CShape
+    {
+        public abstract void Save(StreamWriter stream);
+        public abstract void Load(StreamReader stream);
+
+        ~CShapeSaveLoad() { }
+    }
 
     public abstract class CShapeFactory
     {
@@ -40,11 +49,41 @@ namespace Lab6
 
             return shape;
         }
+
+        ~CMyShapeFactory() { }
     }
 
     public class CShapeStorage : MyStorage
     {
-        public void loadShapes(StreamReader stream, CShapeFactory factory, DrawFigures G)
+        public CSGroup LoadCreateGroup(StreamReader stream, CShapeFactory factory, DrawFigures G)
+        {
+            char code;
+            string line;
+
+            CSGroup group = new CSGroup();
+
+            int i = 0;
+
+            while ((line = stream.ReadLine()) != "GroupEnd")
+            {
+                if (line == "Group")
+                    LoadCreateGroup(stream, factory, G);
+
+
+                code = Convert.ToChar(line);
+
+                group.Add(factory.createShape(code, G));
+
+                if (group.GetObject(i) is CShapeSaveLoad c)
+                    c.Load(stream);
+
+                i++;
+            }
+
+            return group;
+        }
+
+        public void LoadShapes(StreamReader stream, CShapeFactory factory, DrawFigures G)
         {
             char code;
 
@@ -52,20 +91,29 @@ namespace Lab6
 
             while ((line = stream.ReadLine()) != null)
             {
-                code = Convert.ToChar(line);
+                if (line == "Group")
+                {
+                    add(LoadCreateGroup(stream, factory, G));
+                }
+                else
+                {
+                    code = Convert.ToChar(line);
 
-                add(factory.createShape(code, G));
+                    add(factory.createShape(code, G));
 
-                //if (data[curr] != null)
-                    //data[curr].Load();
-                    
+                    if (data[curr - 1] is CShapeSaveLoad c)
+                        c.Load(stream);
+                }
+
             }
 
             stream.Close();
         }
+
+        ~CShapeStorage() { }
     }
 
-    public class CSGroup : CShape
+    public class CSGroup : CShapeSaveLoad
     {
         List<CShape> group; // группа фигур
 
@@ -165,17 +213,13 @@ namespace Lab6
 
             stream.WriteLine("Group");
 
-            foreach (CShape a in group)
+            foreach (CShapeSaveLoad a in group)
                 a.Save(stream);
 
             stream.WriteLine("GroupEnd");
         }
 
-        public override void Load(StreamReader stream)
-        {
-            foreach (CShape a in group)
-                a.Load(stream);
-        }
+        public override void Load(StreamReader stream){}
     }
 
     public class DrawFigures
@@ -282,7 +326,7 @@ namespace Lab6
         }
     }
 
-    public class CCircle : CShape
+    public class CCircle : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -377,20 +421,33 @@ namespace Lab6
 
         public override void Load(StreamReader stream)
         {
-            String line;
+            String line = stream.ReadLine();
 
             int[] data = new int[3];
 
-            while ((line = stream.ReadLine()) != null)
-            {
+            string str = "";
 
+            int i = 0;
+
+            foreach (char symbol in line)
+            {
+                if ("1234567890".Contains(symbol))
+                    str += symbol;
+                else
+                {
+                    data[i] = Convert.ToInt32(str);
+                    str = "";
+                    i++;
+                }
             }
 
-            stream.Close();
+            x = data[0];
+            y = data[1];
+            R = data[2];
         }
     }
 
-    public class CTriangle : CShape
+    public class CTriangle : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -498,15 +555,12 @@ namespace Lab6
 
         public override void Save(StreamWriter stream)
         {
-            stream.WriteLine("T");
-            foreach(Point p in points)
-            {
-                stream.Write("(");
-                stream.Write(p.X);
-                stream.Write(", ");
-                stream.Write(p.Y);
-                stream.Write(")");
+            int[] data = new int[] { x, y };
 
+            stream.WriteLine("T");
+            for (int i = 0; i < data.Length; i++)
+            {
+                stream.Write(data[i]);
                 stream.Write(" ");
             }
 
@@ -515,11 +569,34 @@ namespace Lab6
 
         public override void Load(StreamReader stream)
         {
-            
+            String line = stream.ReadLine();
+
+            int[] data = new int[2];
+
+            string str = "";
+
+            int i = 0;
+
+            foreach (char symbol in line)
+            {
+                if ("1234567890".Contains(symbol))
+                    str += symbol;
+                else
+                {
+                    data[i] = Convert.ToInt32(str);
+                    str = "";
+                    i++;
+                }
+            }
+
+            x = data[0];
+            y = data[1];
+
+            UpdateExtremePoints();
         }
     }
 
-    public class CSquare : CShape
+    public class CSquare : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -611,7 +688,29 @@ namespace Lab6
 
         public override void Load(StreamReader stream)
         {
+            String line = stream.ReadLine();
 
+            int[] data = new int[3];
+
+            string str = "";
+
+            int i = 0;
+
+            foreach (char symbol in line)
+            {
+                if ("1234567890".Contains(symbol))
+                    str += symbol;
+                else
+                {
+                    data[i] = Convert.ToInt32(str);
+                    str = "";
+                    i++;
+                }
+            }
+
+            x = data[0];
+            y = data[1];
+            a = data[2];
         }
     }
 }
