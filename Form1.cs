@@ -16,6 +16,7 @@ namespace Lab6
     {
         CShapeStorage storage; // хранилище
         DrawFigures G; // рисовальщик
+        CShapeFactory factory; // фабрика фигур (для загрузки из файла)
 
         bool ctrlPressed;
 
@@ -23,7 +24,9 @@ namespace Lab6
         {
             InitializeComponent();
             storage = new CShapeStorage();
-            G = new DrawFigures(sheet.Width, sheet.Height);
+            G = new DrawFigures(sheet);
+
+            factory = new CMyShapeFactory();
 
             foreach (var color in Enum.GetNames(typeof(KnownColor)))
                 colorList.Items.Add(color.ToString());
@@ -265,10 +268,10 @@ namespace Lab6
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            StreamWriter stream = new StreamWriter("C://CPP/OOP/Lab6/Shapes.txt", false);
+            StreamWriter stream = new StreamWriter("D://CPP/OOP/Lab6/Shapes.txt", false);
 
             for (storage.first(); !storage.isEOL(); storage.next())
-                if (storage.getObject() is CShapeSaveLoad c)
+                if (storage.getObject() is CShape c)
                     c.Save(stream);
 
             stream.Close();
@@ -276,9 +279,7 @@ namespace Lab6
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            StreamReader stream = new StreamReader("C://CPP/OOP/Lab6/Shapes.txt", false);
-
-            CShapeFactory factory = new CMyShapeFactory();
+            StreamReader stream = new StreamReader("D://CPP/OOP/Lab6/Shapes.txt", false);
 
             storage.loadShapes(stream, factory, G);
 

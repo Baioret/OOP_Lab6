@@ -7,7 +7,6 @@ using System.Drawing;
 using ClassLibraryStorage;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Windows.Forms;
 
 
@@ -24,7 +23,7 @@ namespace Lab6
     {
         public override CShape createShape(char code, DrawFigures G)
         {
-            CShapeSaveLoad shape = null;
+            CShape shape = null;
 
             switch(code)
             {
@@ -66,16 +65,7 @@ namespace Lab6
         }
     }
 
-    public abstract class CShapeSaveLoad : CShape
-    {
-        protected Form1 form = new Form1();
-
-        public abstract void Save(StreamWriter stream);
-
-        public abstract void Load(StreamReader stream);
-    }
-
-    public class CSGroup : CShapeSaveLoad
+    public class CSGroup : CShape
     {
         List<CShape> group; // группа фигур
 
@@ -175,7 +165,7 @@ namespace Lab6
 
             stream.WriteLine("Group");
 
-            foreach (CShapeSaveLoad a in group)
+            foreach (CShape a in group)
                 a.Save(stream);
 
             stream.WriteLine("GroupEnd");
@@ -183,7 +173,7 @@ namespace Lab6
 
         public override void Load(StreamReader stream)
         {
-            foreach (CShapeSaveLoad a in group)
+            foreach (CShape a in group)
                 a.Load(stream);
         }
     }
@@ -292,7 +282,7 @@ namespace Lab6
         }
     }
 
-    public class CCircle : CShapeSaveLoad
+    public class CCircle : CShape
     {
         private DrawFigures draw;
 
@@ -400,7 +390,7 @@ namespace Lab6
         }
     }
 
-    public class CTriangle : CShapeSaveLoad
+    public class CTriangle : CShape
     {
         private DrawFigures draw;
 
@@ -529,7 +519,7 @@ namespace Lab6
         }
     }
 
-    public class CSquare : CShapeSaveLoad
+    public class CSquare : CShape
     {
         private DrawFigures draw;
 
