@@ -7,13 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 using ClassLibraryStorage;
 
 namespace Lab6
 {
     public partial class Form1 : Form
     {
-        MyStorage storage; // хранилище
+        CShapeStorage storage; // хранилище
         DrawFigures G; // рисовальщик
 
         bool ctrlPressed;
@@ -21,16 +22,21 @@ namespace Lab6
         public Form1()
         {
             InitializeComponent();
-            storage = new MyStorage();
+            storage = new CShapeStorage();
             G = new DrawFigures(sheet.Width, sheet.Height);
 
             foreach (var color in Enum.GetNames(typeof(KnownColor)))
                 colorList.Items.Add(color.ToString());
         }
 
-        public PictureBox GetSheet()
+        public ref PictureBox GetSheet()
         {
-            return sheet;
+            return ref sheet;
+        }
+
+        public ref DrawFigures GetDrawFigures()
+        {
+            return ref G;
         }
 
         private void sheet_MouseUp(object sender, MouseEventArgs e)
@@ -63,7 +69,9 @@ namespace Lab6
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            G.ClearSheet();
             G.DrawStorage(storage);
+            sheet.Image = G.GetBitmap();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -166,7 +174,6 @@ namespace Lab6
             panel.Height = this.Size.Height - 39;
         }
 
-        // СДЕЛАТЬ MVC
         private void btnCircle_Click(object sender, EventArgs e)
         {
             btnCircle.Enabled = false;
@@ -217,6 +224,65 @@ namespace Lab6
         private void colorList_DropDownClosed(object sender, EventArgs e)
         {
             ActiveControl = sheet;
+        }
+
+        private void btnGroup_Click(object sender, EventArgs e)
+        {
+            CSGroup group = new CSGroup();
+
+            for (storage.first(); !storage.isEOL(); storage.next())
+                if (storage.getObject() is CShape c)
+                    if (c.Selected())
+                    {
+                        group.Add(c);
+                        storage.del(c);
+                    }
+
+            storage.add(group);
+            ActiveControl = sheet;
+
+            UpdateSheet();
+        }
+
+        private void btnUngroup_Click(object sender, EventArgs e)
+        {
+            for (storage.first(); !storage.isEOL(); storage.next())
+                if (storage.getObject() is CSGroup c)
+                    if (c.Selected())
+                    {
+                        int size = c.Size();
+
+                        storage.del(c);
+
+                        for (int i = 0; i < size; i++)
+                            storage.add(c.GetObject(i));
+                    }
+
+            UpdateSheet();
+
+            ActiveControl = sheet;
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            StreamWriter stream = new StreamWriter("C://CPP/OOP/Lab6/Shapes.txt", false);
+
+            for (storage.first(); !storage.isEOL(); storage.next())
+                if (storage.getObject() is CShapeSaveLoad c)
+                    c.Save(stream);
+
+            stream.Close();
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            StreamReader stream = new StreamReader("C://CPP/OOP/Lab6/Shapes.txt", false);
+
+            CShapeFactory factory = new CMyShapeFactory();
+
+            storage.loadShapes(stream, factory, G);
+
+            stream.Close();
         }
     }
 }

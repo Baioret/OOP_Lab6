@@ -7,10 +7,187 @@ using System.Drawing;
 using ClassLibraryStorage;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Windows.Forms;
+
 
 namespace Lab6
 {
+
+    public abstract class CShapeFactory
+    {
+		public abstract CShape createShape(char code, DrawFigures G);
+		~CShapeFactory() { }
+    };
+
+    public class CMyShapeFactory : CShapeFactory
+    {
+        public override CShape createShape(char code, DrawFigures G)
+        {
+            CShapeSaveLoad shape = null;
+
+            switch(code)
+            {
+                case 'C':
+                    shape = new CCircle(0, 0, G);
+                    break;
+                case 'T':
+                    shape = new CTriangle(0, 0, G);
+                    break;
+                case 'S':
+                    shape = new CSquare(0, 0, G);
+                    break;
+            }
+
+            return shape;
+        }
+    }
+
+    public class CShapeStorage : MyStorage
+    {
+        public void loadShapes(StreamReader stream, CShapeFactory factory, DrawFigures G)
+        {
+            char code;
+
+            string line;
+
+            while ((line = stream.ReadLine()) != null)
+            {
+                code = Convert.ToChar(line);
+
+                add(factory.createShape(code, G));
+
+                //if (data[curr] != null)
+                    //data[curr].Load();
+                    
+            }
+
+            stream.Close();
+        }
+    }
+
+    public abstract class CShapeSaveLoad : CShape
+    {
+        protected Form1 form = new Form1();
+
+        public abstract void Save(StreamWriter stream);
+
+        public abstract void Load(StreamReader stream);
+    }
+
+    public class CSGroup : CShapeSaveLoad
+    {
+        List<CShape> group; // группа фигур
+
+        public CSGroup()
+        {
+            group = new List<CShape>();
+        }
+
+        ~CSGroup()
+        {
+            group.Clear();
+        }
+
+        public void Add(CShape shape)
+        {
+            group.Add(shape);
+        }
+
+        public CShape GetObject(int i)
+        {
+            return group[i];
+        }
+
+        public int Size()
+        {
+            return group.Count;
+        }
+
+        public override void Select()
+        {
+            foreach (CShape a in group)
+                a.Select();
+
+            selected = true;
+        }
+
+        public override void Unselect()
+        {
+            foreach (CShape a in group)
+                a.Unselect();
+
+            selected = false;
+        }
+
+        public override void ChangeColor(string color)
+        {
+            foreach(CShape a in group)
+                a.ChangeColor(color);
+        }
+
+        public override void ChangeSize(string mode)
+        {
+            if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+                foreach (CShape a in group)
+                    a.ChangeSize(mode);
+        }
+
+        public override void Draw()
+        {
+            foreach (CShape a in group)
+                a.Draw();
+        }
+
+        public override bool Movable(string direction)
+        {
+            foreach (CShape a in group)
+                if(!a.Movable(direction))
+                    return false;
+
+            return true;
+        }
+
+        public override void Move(string direction)
+        {
+            if (Movable(direction))
+                foreach (CShape a in group)
+                    a.Move(direction);
+        }
+
+        public override void UpdateExtremePoints()
+        {
+            foreach (CShape a in group)
+                a.UpdateExtremePoints();
+        }
+
+        public override bool WasClicked(int x0, int y0)
+        {
+            foreach (CShape a in group)
+                if (a.WasClicked(x0, y0))
+                    return true;
+
+            return false;
+        }
+
+        public override void Save(StreamWriter stream)
+        {
+
+            stream.WriteLine("Group");
+
+            foreach (CShapeSaveLoad a in group)
+                a.Save(stream);
+
+            stream.WriteLine("GroupEnd");
+        }
+
+        public override void Load(StreamReader stream)
+        {
+            foreach (CShapeSaveLoad a in group)
+                a.Load(stream);
+        }
+    }
+
     public class DrawFigures
     {
         private Bitmap bitmap;
@@ -19,9 +196,13 @@ namespace Lab6
         private Graphics g;
         private Brush brush = null;
 
-        public DrawFigures(int width, int height)
+        public PictureBox sheet;
+
+        public DrawFigures(PictureBox PB)
         {
-            bitmap = new Bitmap(width, height);
+            sheet = PB;
+
+            bitmap = new Bitmap(sheet.Width, sheet.Height);
             g = Graphics.FromImage(bitmap);
             ClearSheet();
             blackPen = new Pen(Color.Black);
@@ -111,7 +292,7 @@ namespace Lab6
         }
     }
 
-    public class CCircle : CShape
+    public class CCircle : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -124,6 +305,7 @@ namespace Lab6
             this.x = x;
             this.y = y;
             R = 30;
+
             draw = G;
 
             UpdateExtremePoints();
@@ -155,15 +337,13 @@ namespace Lab6
 
         public override bool Movable(string direction)
         {
-            Form1 form = new Form1();
-            PictureBox sheet = form.GetSheet();
 
             if (direction == "up")
                 return extremePoints[1].Y - 5 >= 0 ? true : false;
             else if (direction == "down")
-                return extremePoints[3].Y + 5 <= sheet.Height ? true : false;
+                return extremePoints[3].Y + 5 <= draw.sheet.Height ? true : false;
             else if (direction == "right")
-                return extremePoints[2].X + 5 <= sheet.Width ? true : false;
+                return extremePoints[2].X + 5 <= draw.sheet.Width ? true : false;
             else if (direction == "left")
                 return extremePoints[0].X - 5 >= 0 ? true : false;
             else
@@ -172,10 +352,13 @@ namespace Lab6
 
         public override void ChangeSize(string mode)
         {
-            if (mode == "+")
-                R += 5;
-            else if (mode == "-" && R > 10)
+            if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+                if (mode == "+")
+                    R += 5;
+            if (mode == "-" && R > 10)
                 R -= 5;
+
+            UpdateExtremePoints();
         }
 
         public override void ChangeColor(string color)
@@ -187,9 +370,37 @@ namespace Lab6
         {
             return (Math.Pow(x - x0, 2) + Math.Pow(y - y0, 2) <= R * R);
         }
+
+        public override void Save(StreamWriter stream)
+        {
+            int[] data = new int[] { x, y, R };
+
+            stream.WriteLine("C");
+            for (int i = 0; i < data.Length; i++)
+            {
+                stream.Write(data[i]);
+                stream.Write(" ");
+            }
+
+            stream.Write("\n");
+        }
+
+        public override void Load(StreamReader stream)
+        {
+            String line;
+
+            int[] data = new int[3];
+
+            while ((line = stream.ReadLine()) != null)
+            {
+
+            }
+
+            stream.Close();
+        }
     }
 
-    public class CTriangle : CShape
+    public class CTriangle : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -199,6 +410,7 @@ namespace Lab6
         {
             this.x = x;
             this.y = y;
+
             draw = G;
 
             UpdateExtremePoints();
@@ -249,15 +461,13 @@ namespace Lab6
 
         public override bool Movable(string direction)
         {
-            Form1 form = new Form1();
-            PictureBox sheet = form.GetSheet();
 
             if (direction == "up")
                 return points[0].Y - 5 >= 0 ? true : false;
             else if (direction == "down")
-                return points[2].Y + 5 <= sheet.Height ? true : false;
+                return points[2].Y + 5 <= draw.sheet.Height ? true : false;
             else if (direction == "right")
-                return points[2].X + 5 <= sheet.Width ? true : false;
+                return points[2].X + 5 <= draw.sheet.Width ? true : false;
             else if (direction == "left")
                 return points[1].X - 5 >= 0 ? true : false;
             else
@@ -267,17 +477,19 @@ namespace Lab6
         public override void ChangeSize(string mode)
         {
             if (mode == "+")
-            {
-                points[0].Y -= 5;
-                points[1].X -= 5; points[1].Y += 5;
-                points[2].X += 5; points[2].Y += 5;
-            }
-            else if (mode == "-" && points[0].Y + 10 != points[1].Y)
+                if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+                {
+                    points[0].Y -= 5;
+                    points[1].X -= 5; points[1].Y += 5;
+                    points[2].X += 5; points[2].Y += 5;
+                }
+
+            if (mode == "-" && points[0].Y + 10 != points[1].Y)
             {
                 points[0].Y += 5;
                 points[1].X += 5; points[1].Y -= 5;
                 points[2].X -= 5; points[2].Y -= 5;
-            }    
+            }
         }
 
         public override void ChangeColor(string color)
@@ -293,9 +505,31 @@ namespace Lab6
 
             return (a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0);
         }
+
+        public override void Save(StreamWriter stream)
+        {
+            stream.WriteLine("T");
+            foreach(Point p in points)
+            {
+                stream.Write("(");
+                stream.Write(p.X);
+                stream.Write(", ");
+                stream.Write(p.Y);
+                stream.Write(")");
+
+                stream.Write(" ");
+            }
+
+            stream.Write("\n");
+        }
+
+        public override void Load(StreamReader stream)
+        {
+            
+        }
     }
 
-    public class CSquare : CShape
+    public class CSquare : CShapeSaveLoad
     {
         private DrawFigures draw;
 
@@ -307,6 +541,7 @@ namespace Lab6
         {
             this.x = x;
             this.y = y;
+
             draw = G;
 
             UpdateExtremePoints();
@@ -336,15 +571,12 @@ namespace Lab6
 
         public override bool Movable(string direction)
         {
-            Form1 form = new Form1();
-            PictureBox sheet = form.GetSheet();
-
             if (direction == "up")
                 return extremePoints[0].Y - 5 >= 0 ? true : false;
             else if (direction == "down")
-                return extremePoints[1].Y + 5 <= sheet.Height ? true : false;
+                return extremePoints[1].Y + 5 <= draw.sheet.Height ? true : false;
             else if (direction == "right")
-                return extremePoints[1].X + 5 <= sheet.Width ? true : false;
+                return extremePoints[1].X + 5 <= draw.sheet.Width ? true : false;
             else if (direction == "left")
                 return extremePoints[0].X - 5 >= 0 ? true : false;
             else
@@ -353,11 +585,14 @@ namespace Lab6
 
         public override void ChangeSize(string mode)
         {
-            if (mode == "+")
-                a += 10;
-            else if (mode == "-")
+            if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+                if (mode == "+")
+                    a += 10;
+            if (mode == "-")
                 if (a > 10)
                     a -= 10;
+
+            UpdateExtremePoints();
         }
 
         public override void ChangeColor(string color)
@@ -368,6 +603,25 @@ namespace Lab6
         public override bool WasClicked(int x0, int y0)
         {
             return x0 >= x - a / 2 && y0 >= y - a / 2 && x0 <= x + a / 2 && y0 <= y + a / 2;
+        }
+
+        public override void Save(StreamWriter stream)
+        {
+            int[] data = new int[] { x, y, a };
+
+            stream.WriteLine("S");
+            for (int i = 0; i < data.Length; i++)
+            {
+                stream.Write(data[i]);
+                stream.Write(" ");
+            }
+
+            stream.Write("\n");
+        }
+
+        public override void Load(StreamReader stream)
+        {
+
         }
     }
 }
