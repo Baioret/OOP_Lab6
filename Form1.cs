@@ -284,6 +284,13 @@ namespace Lab6
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            for (storage.first(); !storage.isEOL(); storage.next())
+                if (storage.getObject() is CShape c)
+                    storage.del(c);
+
+            storage = new CShapeStorage();
+
+
             OpenFileDialog file = new OpenFileDialog();
 
             if (file.ShowDialog() == DialogResult.OK)

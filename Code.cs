@@ -67,9 +67,13 @@ namespace Lab6
             while ((line = stream.ReadLine()) != "GroupEnd")
             {
                 if (line == "Group")
-                    LoadCreateGroup(stream, factory, G);
+                {
+                    group.Add(LoadCreateGroup(stream, factory, G));
+                    line = stream.ReadLine();
+                    i++;
+                }
 
-
+                // когда я выхожу из рекурсии, line всё еще == Group, поэтому не работает
                 code = Convert.ToChar(line);
 
                 group.Add(factory.createShape(code, G));

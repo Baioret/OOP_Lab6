@@ -52,7 +52,7 @@
             this.sheet.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sheet.Location = new System.Drawing.Point(150, 0);
             this.sheet.Name = "sheet";
-            this.sheet.Size = new System.Drawing.Size(949, 803);
+            this.sheet.Size = new System.Drawing.Size(1226, 803);
             this.sheet.TabIndex = 0;
             this.sheet.TabStop = false;
             this.sheet.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
@@ -217,10 +217,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1099, 800);
+            this.ClientSize = new System.Drawing.Size(1375, 800);
             this.Controls.Add(this.panel);
             this.Controls.Add(this.sheet);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview = true;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form1";
             this.Text = "Визуальный редактор";
             this.ResizeEnd += new System.EventHandler(this.Form1_ResizeEnd);
