@@ -42,6 +42,7 @@
             this.btnSquare = new System.Windows.Forms.Button();
             this.btnCircle = new System.Windows.Forms.Button();
             this.btnTriangle = new System.Windows.Forms.Button();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.sheet)).BeginInit();
             this.panel.SuspendLayout();
             this.SuspendLayout();
@@ -56,6 +57,7 @@
             this.sheet.TabIndex = 0;
             this.sheet.TabStop = false;
             this.sheet.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+            this.sheet.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sheet_MouseDown);
             this.sheet.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sheet_MouseUp);
             // 
             // panel
@@ -252,6 +254,7 @@
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.Button btnSave;
         public System.Windows.Forms.PictureBox sheet;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
     }
 }
 

@@ -69,19 +69,19 @@ namespace Lab6
                 if (line == "Group")
                 {
                     group.Add(LoadCreateGroup(stream, factory, G));
-                    line = stream.ReadLine();
                     i++;
                 }
+                else
+                {
+                    code = Convert.ToChar(line);
 
-                // когда я выхожу из рекурсии, line всё еще == Group, поэтому не работает
-                code = Convert.ToChar(line);
+                    group.Add(factory.createShape(code, G));
 
-                group.Add(factory.createShape(code, G));
+                    if (group.GetObject(i) is CShapeSaveLoad c)
+                        c.Load(stream);
 
-                if (group.GetObject(i) is CShapeSaveLoad c)
-                    c.Load(stream);
-
-                i++;
+                    i++;
+                }
             }
 
             return group;
@@ -99,6 +99,8 @@ namespace Lab6
                 {
                     add(LoadCreateGroup(stream, factory, G));
                 }
+                else if (line == "GroupEnd")
+                    continue;
                 else
                 {
                     code = Convert.ToChar(line);

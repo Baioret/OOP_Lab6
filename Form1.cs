@@ -42,6 +42,11 @@ namespace Lab6
             return ref G;
         }
 
+        private void sheet_MouseDown(object sender, MouseEventArgs e)
+        {
+
+        }
+
         private void sheet_MouseUp(object sender, MouseEventArgs e)
         {
             G.ClearSheet();
@@ -54,7 +59,7 @@ namespace Lab6
                 if (storage.getObject() is CShape c)
                     if (c.WasClicked(e.X, e.Y) == true)
                         curr = c;
-
+            
             if (curr != null)
             {
                 if (ctrlPressed == false)
@@ -268,11 +273,10 @@ namespace Lab6
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            OpenFileDialog file = new OpenFileDialog();
 
-            if (file.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                StreamWriter stream = new StreamWriter(file.FileName, false);
+                StreamWriter stream = new StreamWriter(openFileDialog.FileName, false);
 
                 for (storage.first(); !storage.isEOL(); storage.next())
                     if (storage.getObject() is CShapeSaveLoad c)
@@ -290,12 +294,9 @@ namespace Lab6
 
             storage = new CShapeStorage();
 
-
-            OpenFileDialog file = new OpenFileDialog();
-
-            if (file.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                StreamReader stream = new StreamReader(file.FileName, false);
+                StreamReader stream = new StreamReader(openFileDialog.FileName, false);
 
                 storage.LoadShapes(stream, factory, G);
 
@@ -303,5 +304,6 @@ namespace Lab6
             }
 
         }
+
     }
 }
