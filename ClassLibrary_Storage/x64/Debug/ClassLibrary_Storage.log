@@ -1,0 +1,27 @@
+﻿  ClassLibrary_Storage.cpp
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): warning C4570: ClassLibraryStorage::CShape: не был объявлен явно как абстрактный, однако содержит абстрактные функции
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): message : void ClassLibraryStorage::CShape::Draw(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(38): message : см. объявление "ClassLibraryStorage::CShape::Draw"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): message : bool ClassLibraryStorage::CShape::WasClicked(int,int): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(40): message : см. объявление "ClassLibraryStorage::CShape::WasClicked"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): message : void ClassLibraryStorage::CShape::ChangeSize(System::String ^): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(42): message : см. объявление "ClassLibraryStorage::CShape::ChangeSize"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): message : bool ClassLibraryStorage::CShape::Movable(System::String ^): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(66): message : см. объявление "ClassLibraryStorage::CShape::Movable"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(10,19): message : void ClassLibraryStorage::CShape::UpdateExtremePoints(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(68): message : см. объявление "ClassLibraryStorage::CShape::UpdateExtremePoints"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): warning C4570: ClassLibraryStorage::IList: не был объявлен явно как абстрактный, однако содержит абстрактные функции
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : void ClassLibraryStorage::IList::add(ClassLibraryStorage::CShape ^): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(74): message : см. объявление "ClassLibraryStorage::IList::add"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : void ClassLibraryStorage::IList::del(ClassLibraryStorage::CShape ^): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(75): message : см. объявление "ClassLibraryStorage::IList::del"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : ClassLibraryStorage::CShape ^ClassLibraryStorage::IList::getObject(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(76): message : см. объявление "ClassLibraryStorage::IList::getObject"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : void ClassLibraryStorage::IList::first(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(77): message : см. объявление "ClassLibraryStorage::IList::first"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : void ClassLibraryStorage::IList::next(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(78): message : см. объявление "ClassLibraryStorage::IList::next"
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(71,19): message : bool ClassLibraryStorage::IList::isEOL(void): абстрактный
+C:\CPP\OOP\ClassLibrary_Storage\ClassLibrary_Storage.h(79): message : см. объявление "ClassLibraryStorage::IList::isEOL"
+  AssemblyInfo.obj : обнаружен модуль MSIL; для MSIL последовательная компоновка отключена; выполняется полная компоновка
+  ClassLibrary_Storage.vcxproj -> C:\CPP\OOP\ClassLibrary_Storage\x64\Debug\ClassLibrary_Storage.dll
