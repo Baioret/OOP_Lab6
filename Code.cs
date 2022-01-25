@@ -362,10 +362,10 @@ namespace Lab6
 
         public override void UpdateExtremePoints()
         {
-            extremePoints[0].X = x - R; extremePoints[0].Y = y; // лево
-            extremePoints[1].X = x; extremePoints[1].Y = y - R; // верх
+            extremePoints[0].X = x; extremePoints[0].Y = y - R; // верх
+            extremePoints[1].X = x; extremePoints[1].Y = y + R; // низ
             extremePoints[2].X = x + R; extremePoints[2].Y = y; // право
-            extremePoints[3].X = x; extremePoints[3].Y = y + R; // низ
+            extremePoints[3].X = x - R; extremePoints[3].Y = y; // лево
         }
 
         public override void Draw()

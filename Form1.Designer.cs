@@ -43,6 +43,7 @@
             this.btnCircle = new System.Windows.Forms.Button();
             this.btnTriangle = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.shapesTree = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.sheet)).BeginInit();
             this.panel.SuspendLayout();
             this.SuspendLayout();
@@ -53,7 +54,7 @@
             this.sheet.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sheet.Location = new System.Drawing.Point(150, 0);
             this.sheet.Name = "sheet";
-            this.sheet.Size = new System.Drawing.Size(1226, 769);
+            this.sheet.Size = new System.Drawing.Size(800, 768);
             this.sheet.TabIndex = 0;
             this.sheet.TabStop = false;
             this.sheet.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
@@ -78,7 +79,7 @@
             this.panel.Controls.Add(this.btnTriangle);
             this.panel.Location = new System.Drawing.Point(0, 0);
             this.panel.Name = "panel";
-            this.panel.Size = new System.Drawing.Size(150, 803);
+            this.panel.Size = new System.Drawing.Size(150, 768);
             this.panel.TabIndex = 1;
             // 
             // btnLoad
@@ -214,12 +215,22 @@
             this.btnTriangle.UseVisualStyleBackColor = true;
             this.btnTriangle.Click += new System.EventHandler(this.btnTriangle_Click);
             // 
+            // shapesTree
+            // 
+            this.shapesTree.BackColor = System.Drawing.Color.Ivory;
+            this.shapesTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.shapesTree.Location = new System.Drawing.Point(950, 0);
+            this.shapesTree.Name = "shapesTree";
+            this.shapesTree.Size = new System.Drawing.Size(427, 768);
+            this.shapesTree.TabIndex = 2;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1375, 768);
+            this.Controls.Add(this.shapesTree);
             this.Controls.Add(this.panel);
             this.Controls.Add(this.sheet);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -255,6 +266,7 @@
         private System.Windows.Forms.Button btnSave;
         public System.Windows.Forms.PictureBox sheet;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.TreeView shapesTree;
     }
 }
 

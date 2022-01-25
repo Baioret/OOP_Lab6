@@ -32,14 +32,14 @@ namespace Lab6
                 colorList.Items.Add(color.ToString());
         }
 
-        public ref PictureBox GetSheet()
+        public PictureBox GetSheet()
         {
-            return ref sheet;
+            return sheet;
         }
 
-        public ref DrawFigures GetDrawFigures()
+        public DrawFigures GetDrawFigures()
         {
-            return ref G;
+            return G;
         }
 
         private void sheet_MouseDown(object sender, MouseEventArgs e)
