@@ -13,13 +13,31 @@ using System.IO;
 
 namespace Lab6
 {
-
-    public abstract class CShapeSaveLoad : CShape
+    public abstract class CShapeCSharpFeat : CShape // то, что нельзя было реализовать вне проекта
     {
+        protected DrawFigures draw;
+
+        protected Point[] extremePoints = new Point[4];
+
+        public override bool Movable(string direction)
+        {
+            if (direction == "up")
+                return extremePoints[0].Y - delta >= 0;
+            else if (direction == "down")
+                return extremePoints[1].Y + delta <= draw.sheet.Height;
+            else if (direction == "right")
+                return extremePoints[2].X + delta <= draw.sheet.Width;
+            else if (direction == "left")
+                return extremePoints[3].X - delta >= 0;
+            else
+                return false;
+        }
+
         public abstract void Save(StreamWriter stream);
+
         public abstract void Load(StreamReader stream);
 
-        ~CShapeSaveLoad() { }
+        ~CShapeCSharpFeat() { }
     }
 
     public abstract class CShapeFactory
@@ -71,13 +89,15 @@ namespace Lab6
                     group.Add(LoadCreateGroup(stream, factory, G));
                     i++;
                 }
+                else if (line == "")
+                    continue;
                 else
                 {
                     code = Convert.ToChar(line);
 
                     group.Add(factory.createShape(code, G));
 
-                    if (group.GetObject(i) is CShapeSaveLoad c)
+                    if (group.GetObject(i) is CShapeCSharpFeat c)
                         c.Load(stream);
 
                     i++;
@@ -99,7 +119,7 @@ namespace Lab6
                 {
                     add(LoadCreateGroup(stream, factory, G));
                 }
-                else if (line == "GroupEnd")
+                else if (line == "GroupEnd" || line == "")
                     continue;
                 else
                 {
@@ -107,7 +127,7 @@ namespace Lab6
 
                     add(factory.createShape(code, G));
 
-                    if (data[curr - 1] is CShapeSaveLoad c)
+                    if (data[curr - 1] is CShapeCSharpFeat c)
                         c.Load(stream);
                 }
 
@@ -119,9 +139,9 @@ namespace Lab6
         ~CShapeStorage() { }
     }
 
-    public class CSGroup : CShapeSaveLoad
+    public class CSGroup : CShapeCSharpFeat
     {
-        List<CShape> group; // группа фигур
+        List<CShape> group;
 
         public CSGroup()
         {
@@ -185,7 +205,7 @@ namespace Lab6
 
         public override bool Movable(string direction)
         {
-            foreach (CShape a in group)
+            foreach (CShapeCSharpFeat a in group)
                 if(!a.Movable(direction))
                     return false;
 
@@ -219,7 +239,7 @@ namespace Lab6
 
             stream.WriteLine("Group");
 
-            foreach (CShapeSaveLoad a in group)
+            foreach (CShapeCSharpFeat a in group)
                 a.Save(stream);
 
             stream.WriteLine("GroupEnd");
@@ -261,20 +281,6 @@ namespace Lab6
             g.Clear(Color.White);
         }
 
-        public Point MoveFigure(int x, int y, string direction)
-        {
-            if (direction == "up")
-                y = y - 5;
-            else if (direction == "down")
-                y = y + 5;
-            else if (direction == "right")
-                x = x + 5;
-            else if (direction == "left")
-                x = x - 5;
-
-            return new Point(x, y);
-        }
-
         public void DrawCircle(int x, int y, int R, bool selected, string color)
         {
             brush = new SolidBrush(Color.FromName(color));
@@ -289,8 +295,15 @@ namespace Lab6
                 g.DrawEllipse(blackPen, (x - R), (y - R), 2 * R, 2 * R);
         }
 
-        public void DrawTriangle(Point[] points, bool selected, string color)
+        public void DrawTriangle(int x, int y, int a, bool selected, string color)
         {
+            Point[] points = new Point[3];
+
+            points[0].X = x; points[0].Y = y - a;
+            points[1].X = x - a; points[1].Y = y + a;
+            points[2].X = x + a; points[2].Y = y + a;
+
+
             brush = new SolidBrush(Color.FromName(color));
 
             g.FillPolygon(brush, points);
@@ -332,13 +345,9 @@ namespace Lab6
         }
     }
 
-    public class CCircle : CShapeSaveLoad
+    public class CCircle : CShapeCSharpFeat
     {
-        private DrawFigures draw;
-
         private int R;
-
-        private Point[] extremePoints = new Point[4];
 
         public CCircle(int x, int y, DrawFigures G)
         {
@@ -364,32 +373,6 @@ namespace Lab6
             draw.DrawCircle(x, y, R, selected, color);
         }
 
-        public override void Move(string direction)
-        {
-            if (Movable(direction))
-            {
-                x = draw.MoveFigure(x, y, direction).X;
-                y = draw.MoveFigure(x, y, direction).Y;
-            }
-
-            UpdateExtremePoints();
-        }
-
-        public override bool Movable(string direction)
-        {
-
-            if (direction == "up")
-                return extremePoints[1].Y - 5 >= 0 ? true : false;
-            else if (direction == "down")
-                return extremePoints[3].Y + 5 <= draw.sheet.Height ? true : false;
-            else if (direction == "right")
-                return extremePoints[2].X + 5 <= draw.sheet.Width ? true : false;
-            else if (direction == "left")
-                return extremePoints[0].X - 5 >= 0 ? true : false;
-            else
-                return false;
-        }
-
         public override void ChangeSize(string mode)
         {
             if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
@@ -399,11 +382,6 @@ namespace Lab6
                 R -= 5;
 
             UpdateExtremePoints();
-        }
-
-        public override void ChangeColor(string color)
-        {
-            this.color = color;
         }
 
         public override bool WasClicked(int x0, int y0)
@@ -423,6 +401,10 @@ namespace Lab6
             }
 
             stream.Write("\n");
+
+            stream.WriteLine(color);
+
+            stream.Write("\n");
         }
 
         public override void Load(StreamReader stream)
@@ -447,17 +429,17 @@ namespace Lab6
                 }
             }
 
+            color = stream.ReadLine();
+
             x = data[0];
             y = data[1];
             R = data[2];
         }
     }
 
-    public class CTriangle : CShapeSaveLoad
+    public class CTriangle : CShapeCSharpFeat
     {
-        private DrawFigures draw;
-
-        private Point[] points = new Point[3];
+        private int a = 30; // отступ от центра
 
         public CTriangle(int x, int y, DrawFigures G)
         {
@@ -471,89 +453,36 @@ namespace Lab6
 
         public override void UpdateExtremePoints()
         {
-            points[0].X = x; points[0].Y = y - 35;      // верх
-            points[1].X = x - 35; points[1].Y = y + 25; // лево
-            points[2].X = x + 35; points[2].Y = y + 25; // право
+            extremePoints[0].X = x; extremePoints[0].Y = y - a;      // верх
+            extremePoints[1].X = x + a; extremePoints[1].Y = y + a; // низ
+            extremePoints[2].X = x + a; extremePoints[2].Y = y + a; // право
+            extremePoints[3].X = x - a; extremePoints[3].Y = y + a; // лево
         }
 
         public override void Draw()
         {
-            draw.DrawTriangle(points, selected, color);
-        }
-
-        public override void Move(string direction)
-        {
-            if (Movable(direction))
-            {
-                if (direction == "up")
-                {
-                    points[0].Y -= 5;
-                    points[1].Y -= 5;
-                    points[2].Y -= 5;
-                }
-                if (direction == "down")
-                {
-                    points[0].Y += 5;
-                    points[1].Y += 5;
-                    points[2].Y += 5;
-                }
-                if (direction == "left")
-                {
-                    points[0].X -= 5;
-                    points[1].X -= 5;
-                    points[2].X -= 5;
-                }
-                if (direction == "right")
-                {
-                    points[0].X += 5;
-                    points[1].X += 5;
-                    points[2].X += 5;
-                }
-            }
-        }
-
-        public override bool Movable(string direction)
-        {
-
-            if (direction == "up")
-                return points[0].Y - 5 >= 0 ? true : false;
-            else if (direction == "down")
-                return points[2].Y + 5 <= draw.sheet.Height ? true : false;
-            else if (direction == "right")
-                return points[2].X + 5 <= draw.sheet.Width ? true : false;
-            else if (direction == "left")
-                return points[1].X - 5 >= 0 ? true : false;
-            else
-                return false;
+            draw.DrawTriangle(x, y, a, selected, color);
         }
 
         public override void ChangeSize(string mode)
         {
+
             if (mode == "+")
                 if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
-                {
-                    points[0].Y -= 5;
-                    points[1].X -= 5; points[1].Y += 5;
-                    points[2].X += 5; points[2].Y += 5;
-                }
+                    a += delta;
 
-            if (mode == "-" && points[0].Y + 10 != points[1].Y)
-            {
-                points[0].Y += 5;
-                points[1].X += 5; points[1].Y -= 5;
-                points[2].X -= 5; points[2].Y -= 5;
-            }
-        }
+            if (mode == "-" && extremePoints[0].Y + delta * 2 != extremePoints[3].Y)
+                a -= delta;
 
-        public override void ChangeColor(string color)
-        {
-            this.color = color;
+            UpdateExtremePoints();
         }
 
         public override bool WasClicked(int x0, int y0)
         {
-            int a = (points[0].X - x0) * (points[1].Y - points[0].Y) - (points[1].X - points[0].X) * (points[0].Y - y0);
-            int b = (points[1].X - x0) * (points[2].Y - points[1].Y) - (points[2].X - points[1].X) * (points[1].Y - y0);
+            Point[] points = extremePoints;
+
+            int a = (points[0].X - x0) * (points[3].Y - points[0].Y) - (points[3].X - points[0].X) * (points[0].Y - y0);
+            int b = (points[3].X - x0) * (points[2].Y - points[3].Y) - (points[2].X - points[3].X) * (points[3].Y - y0);
             int c = (points[2].X - x0) * (points[0].Y - points[2].Y) - (points[0].X - points[2].X) * (points[2].Y - y0);
 
             return (a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0);
@@ -561,7 +490,7 @@ namespace Lab6
 
         public override void Save(StreamWriter stream)
         {
-            int[] data = new int[] { x, y };
+            int[] data = new int[] { x, y, a };
 
             stream.WriteLine("T");
             for (int i = 0; i < data.Length; i++)
@@ -571,13 +500,17 @@ namespace Lab6
             }
 
             stream.Write("\n");
+
+            stream.WriteLine(color);
+
+            stream.Write("\n");
         }
 
         public override void Load(StreamReader stream)
         {
             String line = stream.ReadLine();
 
-            int[] data = new int[2];
+            int[] data = new int[3];
 
             string str = "";
 
@@ -595,20 +528,20 @@ namespace Lab6
                 }
             }
 
+            color = stream.ReadLine();
+
             x = data[0];
             y = data[1];
+            a = data[2];
 
             UpdateExtremePoints();
         }
     }
 
-    public class CSquare : CShapeSaveLoad
+    public class CSquare : CShapeCSharpFeat
     {
-        private DrawFigures draw;
 
         private int a = 60; // сторона квадрата
-
-        private Point[] extremePoints = new Point[2];
 
         public CSquare(int x, int y, DrawFigures G)
         {
@@ -622,38 +555,15 @@ namespace Lab6
 
         public override void UpdateExtremePoints()
         {
-            extremePoints[0].X = x - a / 2; extremePoints[0].Y = y - a / 2; // верхняя правая
-            extremePoints[1].X = x + a / 2; extremePoints[1].Y = y + a / 2; // левая нижняя
+            extremePoints[0].X = x - a / 2; extremePoints[0].Y = y - a / 2; // верх
+            extremePoints[1].X = x + a / 2; extremePoints[1].Y = y + a / 2; // низ
+            extremePoints[2].X = x + a / 2; extremePoints[2].Y = y + a / 2; // право
+            extremePoints[3].X = x - a / 2; extremePoints[3].Y = y - a / 2; // лево
         }
 
         public override void Draw()
         {
             draw.DrawSquare(x - a / 2, y - a / 2, a, selected, color);
-        }
-
-        public override void Move(string direction)
-        {
-            if (Movable(direction))
-            {
-                x = draw.MoveFigure(x, y, direction).X;
-                y = draw.MoveFigure(x, y, direction).Y;
-            }
-
-            UpdateExtremePoints();
-        }
-
-        public override bool Movable(string direction)
-        {
-            if (direction == "up")
-                return extremePoints[0].Y - 5 >= 0 ? true : false;
-            else if (direction == "down")
-                return extremePoints[1].Y + 5 <= draw.sheet.Height ? true : false;
-            else if (direction == "right")
-                return extremePoints[1].X + 5 <= draw.sheet.Width ? true : false;
-            else if (direction == "left")
-                return extremePoints[0].X - 5 >= 0 ? true : false;
-            else
-                return false;
         }
 
         public override void ChangeSize(string mode)
@@ -666,11 +576,6 @@ namespace Lab6
                     a -= 10;
 
             UpdateExtremePoints();
-        }
-
-        public override void ChangeColor(string color)
-        {
-            this.color = color;
         }
 
         public override bool WasClicked(int x0, int y0)
@@ -690,6 +595,10 @@ namespace Lab6
             }
 
             stream.Write("\n");
+
+            stream.WriteLine(color);
+
+            stream.Write("\n");
         }
 
         public override void Load(StreamReader stream)
@@ -713,6 +622,8 @@ namespace Lab6
                     i++;
                 }
             }
+
+            color = stream.ReadLine();
 
             x = data[0];
             y = data[1];

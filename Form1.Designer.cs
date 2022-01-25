@@ -53,7 +53,7 @@
             this.sheet.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sheet.Location = new System.Drawing.Point(150, 0);
             this.sheet.Name = "sheet";
-            this.sheet.Size = new System.Drawing.Size(1226, 803);
+            this.sheet.Size = new System.Drawing.Size(1226, 769);
             this.sheet.TabIndex = 0;
             this.sheet.TabStop = false;
             this.sheet.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
@@ -84,7 +84,7 @@
             // btnLoad
             // 
             this.btnLoad.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnLoad.Location = new System.Drawing.Point(23, 751);
+            this.btnLoad.Location = new System.Drawing.Point(23, 721);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(100, 26);
             this.btnLoad.TabIndex = 11;
@@ -96,7 +96,7 @@
             // btnSave
             // 
             this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnSave.Location = new System.Drawing.Point(23, 720);
+            this.btnSave.Location = new System.Drawing.Point(23, 690);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(100, 26);
             this.btnSave.TabIndex = 10;
@@ -219,7 +219,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1375, 800);
+            this.ClientSize = new System.Drawing.Size(1375, 768);
             this.Controls.Add(this.panel);
             this.Controls.Add(this.sheet);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;

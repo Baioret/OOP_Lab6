@@ -25,11 +25,8 @@ namespace Lab6
             InitializeComponent();
             storage = new CShapeStorage();
             G = new DrawFigures(sheet);
-<<<<<<< HEAD
 
             factory = new CMyShapeFactory();
-=======
->>>>>>> 458bfb0 (. . .)
 
             foreach (var color in Enum.GetNames(typeof(KnownColor)))
                 colorList.Items.Add(color.ToString());
@@ -282,7 +279,7 @@ namespace Lab6
                 StreamWriter stream = new StreamWriter(openFileDialog.FileName, false);
 
                 for (storage.first(); !storage.isEOL(); storage.next())
-                    if (storage.getObject() is CShapeSaveLoad c)
+                    if (storage.getObject() is CShapeCSharpFeat c)
                         c.Save(stream);
 
                 stream.Close();

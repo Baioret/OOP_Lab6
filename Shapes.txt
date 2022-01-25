@@ -1,43 +1,20 @@
-<<<<<<< HEAD
-C
-227 394 30 
-C
-343 243 30 
-C
-488 307 30 
-Group
-C
-384 437 30 
-Group
-S
-441 541 60 
-S
-600 442 60 
 T
-(699, 502) (664, 562) (734, 562) 
-GroupEnd
-GroupEnd
-S
-215 291 60 
-T
-(562, 495) (527, 555) (597, 555) 
-=======
+321 295 15 
+LightCyan
+
 Group
 Group
-C
-337 323 30 
 T
-(182, 372) (147, 432) (217, 432) 
-S
-256 550 60 
-GroupEnd
-T
-(107, 461) (72, 521) (142, 521) 
-GroupEnd
+191 303 120 
+LavenderBlush
+
 C
-295 234 30 
-C
-381 235 30 
+318 130 50 
+LavenderBlush
+
+GroupEnd
 S
-180 615 60 
->>>>>>> 458bfb0 (. . .)
+501 290 60 
+LightGoldenrodYellow
+
+GroupEnd
