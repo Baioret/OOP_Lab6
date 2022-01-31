@@ -42,6 +42,16 @@ namespace Lab6
             return G;
         }
 
+        //========================================
+
+        private void shapesTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            
+        }
+
+
+        //========================================
+
         private void sheet_MouseDown(object sender, MouseEventArgs e)
         {
 
@@ -59,7 +69,7 @@ namespace Lab6
                 if (storage.getObject() is CShape c)
                     if (c.WasClicked(e.X, e.Y) == true)
                         curr = c;
-            
+
             if (curr != null)
             {
                 if (ctrlPressed == false)
@@ -206,7 +216,7 @@ namespace Lab6
             btnTriangle.Enabled = true;
             btnSquare.Enabled = false;
 
-           ActiveControl = sheet;
+            ActiveControl = sheet;
         }
 
         private void colorList_SelectionChangeCommitted(object sender, EventArgs e)
@@ -236,7 +246,7 @@ namespace Lab6
 
         private void btnGroup_Click(object sender, EventArgs e)
         {
-            CSGroup group = new CSGroup();
+            CSGroup group = new CSGroup(G);
 
             for (storage.first(); !storage.isEOL(); storage.next())
                 if (storage.getObject() is CShape c)
@@ -246,7 +256,11 @@ namespace Lab6
                         storage.del(c);
                     }
 
-            storage.add(group);
+            if (group.Size() > 0)
+                storage.add(group);
+            else
+                group.Dispose();
+
             ActiveControl = sheet;
 
             UpdateSheet();
@@ -278,12 +292,16 @@ namespace Lab6
             {
                 StreamWriter stream = new StreamWriter(openFileDialog.FileName, false);
 
+                stream.WriteLine(storage.Size());
+
                 for (storage.first(); !storage.isEOL(); storage.next())
                     if (storage.getObject() is CShapeCSharpFeat c)
                         c.Save(stream);
 
                 stream.Close();
             }
+
+            ActiveControl = sheet;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -303,6 +321,7 @@ namespace Lab6
                 stream.Close();
             }
 
+            ActiveControl = sheet;
         }
 
     }

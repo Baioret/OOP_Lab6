@@ -223,6 +223,7 @@
             this.shapesTree.Name = "shapesTree";
             this.shapesTree.Size = new System.Drawing.Size(427, 768);
             this.shapesTree.TabIndex = 2;
+            this.shapesTree.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.shapesTree_NodeMouseClick);
             // 
             // Form1
             // 

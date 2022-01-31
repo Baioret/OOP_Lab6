@@ -35,7 +35,7 @@ namespace Lab6
 
         public abstract void Save(StreamWriter stream);
 
-        public abstract void Load(StreamReader stream);
+        public abstract void Load(StreamReader stream, CShapeFactory factory);
 
         ~CShapeCSharpFeat() { }
     }
@@ -63,6 +63,9 @@ namespace Lab6
                 case 'S':
                     shape = new CSquare(0, 0, G);
                     break;
+                case 'G':
+                    shape = new CSGroup(G);
+                    break;
             }
 
             return shape;
@@ -73,38 +76,9 @@ namespace Lab6
 
     public class CShapeStorage : MyStorage
     {
-        public CSGroup LoadCreateGroup(StreamReader stream, CShapeFactory factory, DrawFigures G)
+        public int Size()
         {
-            char code;
-            string line;
-
-            CSGroup group = new CSGroup();
-
-            int i = 0;
-
-            while ((line = stream.ReadLine()) != "GroupEnd")
-            {
-                if (line == "Group")
-                {
-                    group.Add(LoadCreateGroup(stream, factory, G));
-                    i++;
-                }
-                else if (line == "")
-                    continue;
-                else
-                {
-                    code = Convert.ToChar(line);
-
-                    group.Add(factory.createShape(code, G));
-
-                    if (group.GetObject(i) is CShapeCSharpFeat c)
-                        c.Load(stream);
-
-                    i++;
-                }
-            }
-
-            return group;
+            return count;
         }
 
         public void LoadShapes(StreamReader stream, CShapeFactory factory, DrawFigures G)
@@ -113,27 +87,22 @@ namespace Lab6
 
             string line;
 
-            while ((line = stream.ReadLine()) != null)
+            int count = Convert.ToInt32(stream.ReadLine());
+
+            for (int i = 0; i < count; i++)
             {
-                if (line == "Group")
-                {
-                    add(LoadCreateGroup(stream, factory, G));
-                }
-                else if (line == "GroupEnd" || line == "")
-                    continue;
-                else
-                {
-                    code = Convert.ToChar(line);
+                line = stream.ReadLine();
 
-                    add(factory.createShape(code, G));
+                if (line == "")
+                    line = stream.ReadLine();
 
-                    if (data[curr - 1] is CShapeCSharpFeat c)
-                        c.Load(stream);
-                }
+                code = Convert.ToChar(line);
 
+                add(factory.createShape(code, G));
+
+                if (data[curr - 1] is CShapeCSharpFeat c)
+                    c.Load(stream, factory);
             }
-
-            stream.Close();
         }
 
         ~CShapeStorage() { }
@@ -143,9 +112,10 @@ namespace Lab6
     {
         List<CShape> group;
 
-        public CSGroup()
+        public CSGroup(DrawFigures G)
         {
             group = new List<CShape>();
+            draw = G;
         }
 
         ~CSGroup()
@@ -192,7 +162,12 @@ namespace Lab6
 
         public override void ChangeSize(string mode)
         {
-            if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+            if (mode == "+") {
+                if (Movable("up") && Movable("down") && Movable("left") && Movable("right"))
+                    foreach (CShape a in group)
+                        a.ChangeSize(mode);
+            }
+            else if (mode == "-")
                 foreach (CShape a in group)
                     a.ChangeSize(mode);
         }
@@ -237,15 +212,40 @@ namespace Lab6
         public override void Save(StreamWriter stream)
         {
 
-            stream.WriteLine("Group");
+            stream.WriteLine("G");
+
+            stream.WriteLine(Size());
 
             foreach (CShapeCSharpFeat a in group)
                 a.Save(stream);
-
-            stream.WriteLine("GroupEnd");
         }
 
-        public override void Load(StreamReader stream){}
+        public override void Load(StreamReader stream, CShapeFactory factory)
+        {
+            char code;
+            string line;
+            int i = 0;
+
+            int count = Convert.ToInt32(stream.ReadLine());
+
+            for (int j = 0; j < count; j++)
+            {
+                line = stream.ReadLine();
+                
+                if (line == "")
+                    line = stream.ReadLine();
+
+
+                code = Convert.ToChar(line);
+
+                Add(factory.createShape(code, draw));
+
+                if (GetObject(i) is CShapeCSharpFeat c)
+                    c.Load(stream, factory);
+
+                i++;
+            }
+        }
     }
 
     public class DrawFigures
@@ -407,9 +407,9 @@ namespace Lab6
             stream.Write("\n");
         }
 
-        public override void Load(StreamReader stream)
+        public override void Load(StreamReader stream, CShapeFactory factory)
         {
-            String line = stream.ReadLine();
+            string line = stream.ReadLine();
 
             int[] data = new int[3];
 
@@ -506,9 +506,9 @@ namespace Lab6
             stream.Write("\n");
         }
 
-        public override void Load(StreamReader stream)
+        public override void Load(StreamReader stream, CShapeFactory factory)
         {
-            String line = stream.ReadLine();
+            string line = stream.ReadLine();
 
             int[] data = new int[3];
 
@@ -601,9 +601,9 @@ namespace Lab6
             stream.Write("\n");
         }
 
-        public override void Load(StreamReader stream)
+        public override void Load(StreamReader stream, CShapeFactory factory)
         {
-            String line = stream.ReadLine();
+            string line = stream.ReadLine();
 
             int[] data = new int[3];
 
